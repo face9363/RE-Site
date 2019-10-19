@@ -1,7 +1,7 @@
 module V1
   class PostsController < ApplicationController
     require 'time'
-    # before_action :set_post, only: [:show, :update, :destroy]
+    before_action :authenticate!, only: [:good]
 
     # GET /posts
     def index
@@ -21,10 +21,23 @@ module V1
         json_post[:created_at] = post.created_at.to_i
         json_post[:latitude] = lat
         json_post[:longitude] = lng
-        json_post[:image] = Image.find_by(post_id: post.id)&.image
+        json_post[:good] = GoodPost.where(post_id: post.id).length
+        # json_post[:image] = Image.find_by(post_id: post.id)&.image
         json_post
       end
       render json: @json_posts.sort_by{|j| j[:distance]}
+    end
+
+    def good
+      @current_user = current_user
+      gp = GoodPost.new
+      gp.user_id = @current_user.id
+      gp.post_id = params[:id]
+      if gp.save!
+        render json: gp
+      else{}
+        render json: gp.errors, status: :unprocessable_entity
+      end
     end
 
     # GET /posts/1
