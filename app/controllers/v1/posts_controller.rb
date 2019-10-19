@@ -31,6 +31,12 @@ module V1
     def create
       @post = Post.new(post_params)
 
+      image = Image.new
+      image.name = params[:name]
+      image.data = request.body_stream
+      image.save!
+
+
       if @post.save
         render json: @post.as_json(only: [:id, :body, :url, :created_at]),
                status: :created, location: v1_post_url(@post.id)
