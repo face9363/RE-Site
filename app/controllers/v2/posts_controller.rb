@@ -21,7 +21,7 @@ module V2
         json_post[:created_at] = post.created_at.to_i
         json_post[:latitude] = lat
         json_post[:longitude] = lng
-        json_post[:user_id] = post.user_id
+        json_post[:user_id] = post&.user_id
         json_post[:good] = GoodPost.where(post_id: post.id).length
         # json_post[:image] = Image.find_by(post_id: post.id)&.image
         json_post
