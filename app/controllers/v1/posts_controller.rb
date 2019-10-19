@@ -7,7 +7,9 @@ module V1
     def index
       lat = params[:latitude].to_f
       lng = params[:longitude].to_f
-      delta = params[:delta].to_f || 0.0001
+      delta = params[:delta].to_f
+      delta = 0.0001 if delta < 0.000001 || delta > 0.1
+      p delta
       @posts = Post.where("(latitude > ?) AND (latitude < ?) AND (longitude > ?) AND (longitude < ?)",
                  lat-delta, lat+delta, lng-delta, lng+delta)
       @json_posts = @posts.map do |post|
