@@ -31,10 +31,10 @@ module V1
     def create
       @post = Post.new(post_params)
 
-      image = Image.new
-      image.name = params[:name]
-      image.data = request.body_stream
-      image.save!
+      # image = Image.new
+      # image.name = params[:name]
+      # image.data = request.body_stream
+      # image.save!
 
 
       if @post.save
