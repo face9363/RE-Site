@@ -7,35 +7,32 @@ module V1
     def index
       lat = params[:latitude].to_f
       lng = params[:longitude].to_f
+      delta = params[:delta].to_f || 0.0001
       @posts = Post.where("(latitude > ?) AND (latitude < ?) AND (longitude > ?) AND (longitude < ?)",
-                 lat-0.000100, lat+0.000100, lng-0.000100, lng+0.000100)
+                 lat-delta, lat+delta, lng-delta, lng+delta)
       @json_posts = @posts.map do |post|
         json_post = {}
         json_post[:id] = post.id
         json_post[:body] = post.body
         json_post[:url] = post.url
         json_post[:distance] = distance(lat, lng, post.latitude, post.longitude)
-        json_post[:created_at] =post.created_at.to_i
+        json_post[:created_at] = post.created_at.to_i
+        json_post[:latitude] = lat
+        json_post[:longitude] = lng
+        json_post[:image] = Image.find_by(post_id: post.id)&.image
         json_post
       end
       render json: @json_posts.sort_by{|j| j[:distance]}
-      # @posts.as_json(only: [:id, :distance, :body, :url, :created_at])
     end
 
     # GET /posts/1
     def show
-      render json: @post
+      render json: Post.all
     end
 
     # POST /posts
     def create
       @post = Post.new(post_params)
-
-      # image = Image.new
-      # image.name = params[:name]
-      # image.data = request.body_stream
-      # image.save!
-
 
       if @post.save
         render json: @post.as_json(only: [:id, :body, :url, :created_at]),
