@@ -8,7 +8,7 @@ module V2
       lat = params[:latitude].to_f
       lng = params[:longitude].to_f
       delta = params[:delta].to_f
-      delta = 0.0001 if delta < 0.000001 || delta > 0.1
+      delta = 0.0001 if delta < 0.000001 || delta > 3
       p delta
       @posts = Post.where("(latitude > ?) AND (latitude < ?) AND (longitude > ?) AND (longitude < ?)",
                  lat-delta, lat+delta, lng-delta, lng+delta)
