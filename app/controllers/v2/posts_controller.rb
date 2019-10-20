@@ -19,8 +19,8 @@ module V2
         json_post[:url] = post.url
         json_post[:distance] = distance(lat, lng, post.latitude, post.longitude)
         json_post[:created_at] = post.created_at.to_i
-        json_post[:latitude] = lat
-        json_post[:longitude] = lng
+        json_post[:latitude] = post.latitude
+        json_post[:longitude] = post.longitude
         json_post[:user_id] = post&.user_id
         json_post[:good] = GoodPost.where(post_id: post.id).length
         # json_post[:image] = Image.find_by(post_id: post.id)&.image
