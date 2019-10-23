@@ -8,7 +8,7 @@ class User < ApplicationRecord
 
 
   def public_return
-    restricted_data(self, [:id, :user_id, :email, :image])
+    restricted_data(self, [:id, :email, :image])
   end
 
 
