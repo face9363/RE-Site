@@ -1,7 +1,7 @@
 module V3
   class PostsController < ApplicationController
     require 'time'
-    before_action :authenticate!, only: [:good, :create]
+    before_action :authenticate!, only: [:good, :create, :update, :destroy, :index]
 
     # GET /posts
     def index
@@ -18,19 +18,14 @@ module V3
         public_return[:distance] = distance(lat, lng, post.latitude, post.longitude)
         public_return
       end
-
       render json: @json_posts.sort_by{|j| j[:distance]}
     end
 
     def good
       @current_user = current_user
-      gp = GoodPost.new
-      gp.user_id = @current_user.id
-      gp.post_id = params[:id]
-      if gp.save!
-        render json: gp
-      else{}
-        render json: gp.errors, status: :unprocessable_entity
+      @post = Post.find(params[:id])
+      if @post.add_good(@current_user.id)
+        render json: @post.public_return
       end
     end
 
@@ -41,13 +36,13 @@ module V3
 
     # POST /posts
     def create
-      json = post_params
+      new_post = post_params
       @current_user = current_user
-      json[:user_id] = @current_user.id
-      @post = Post.new(json)
+      new_post[:user_id] = @current_user.id
+      @post = Post.new(new_post)
       if @post.save
-        render json: @post.as_json(only: [:id, :body, :url, :created_at]),
-               status: :created, location: v1_post_url(@post.id)
+        render json: @post.public_return,
+               status: :created, location: v3_post_url(@post.id)
       else
         render json: @post.errors, status: :unprocessable_entity
       end
@@ -55,16 +50,22 @@ module V3
 
     # PATCH/PUT /posts/1
     def update
-      if @post.update(post_params)
-        render json: @post
-      else
-        render json: @post.errors, status: :unprocessable_entity
+      set_post
+      if @post.user_id == current_user.id
+        if @post.update(post_params)
+          render json: @post
+        else
+          render json: @post.errors, status: :unprocessable_entity
+        end
       end
     end
 
     # DELETE /posts/1
     def destroy
-      @post.destroy
+      set_post
+      if current_user.id == @post.user_id
+        @post.destroy
+      end
     end
 
     private

@@ -14,9 +14,9 @@ class Post < ApplicationRecord
   def add_good(user_id)
     gp = GoodPost.new
     gp.user_id = user_id
-    gp.post_id = self.post_id
+    gp.post_id = self.id
     if gp.save!
-      self.increment!(:good)
+      self.increment!(:good_points)
       return true
     else
       return false
