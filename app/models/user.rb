@@ -5,4 +5,11 @@ class User < ApplicationRecord
   validates :email, presence: true
   validates :email, uniqueness: true
   validates :name, presence: true
+
+
+  def public_return
+    restricted_data(self, [:id, :user_id, :email])
+  end
+
+
 end
