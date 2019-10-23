@@ -39,7 +39,6 @@ ActiveRecord::Schema.define(version: 20191023041436) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id"
-    t.integer "good"
     t.integer "good_points", default: 0
     t.index ["latitude"], name: "index_posts_on_latitude"
     t.index ["longitude"], name: "index_posts_on_longitude"

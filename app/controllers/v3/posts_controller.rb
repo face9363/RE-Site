@@ -9,23 +9,16 @@ module V3
       lng = params[:longitude].to_f
       delta = params[:delta].to_f
       delta = 0.0001 if delta < 0.000001 || delta > 3
-      p delta
+
       @posts = Post.where("(latitude > ?) AND (latitude < ?) AND (longitude > ?) AND (longitude < ?)",
                  lat-delta, lat+delta, lng-delta, lng+delta)
+
       @json_posts = @posts.map do |post|
-        json_post = {}
-        json_post[:id] = post.id
-        json_post[:body] = post.body
-        json_post[:url] = post.url
-        json_post[:distance] = distance(lat, lng, post.latitude, post.longitude)
-        json_post[:created_at] = post.created_at.to_i
-        json_post[:latitude] = post.latitude
-        json_post[:longitude] = post.longitude
-        json_post[:user_id] = post&.user_id
-        json_post[:good] = GoodPost.where(post_id: post.id).length
-        # json_post[:image] = Image.find_by(post_id: post.id)&.image
-        json_post
+        public_return = post.public_return_with_user
+        public_return[:distance] = distance(lat, lng, post.latitude, post.longitude)
+        public_return
       end
+
       render json: @json_posts.sort_by{|j| j[:distance]}
     end
 

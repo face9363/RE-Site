@@ -5,7 +5,7 @@ class Post < ApplicationRecord
   end
 
   def public_return_with_user
-    return_data = public_return
+    p return_data = public_return
     user =  User.find(return_data[:user_id])
     return_data[:user_name] = user.name
     return_data
