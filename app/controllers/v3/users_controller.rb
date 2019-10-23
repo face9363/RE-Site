@@ -5,25 +5,33 @@ module V3
   # GET /users
   def index
     @users = User.all
-
-    render json: @users.as_json(only: [:id, :name, :email, :image])
+    render json: @users.map{|u| u.public_return}
   end
 
   def me
-    render json: current_user.as_json(only: [:id, :name, :email, :token, :image])
+    @current_user = current_user
+    render json:
+               {
+                  user: @current_user.public_return,
+                  token: @current_user.token
+               }
   end
 
   # GET /users/1
   def show
-    render json: set_user.as_json(only: [:id, :name, :email, :image])
+    render json: set_user.public_return
   end
 
   # POST /users
   def create
     @user = User.new(user_params)
-
     if @user.save
-      render json: @user.as_json(only: [:id, :name, :email, :token]), status: :created, location: v1_user_path(@user.id)
+      render json:
+                 {
+                     user: @user.public_return,
+                     token: @user.token
+                 },
+      status: :created, location: v3_user_path(@user.id)
     else
       render json: @user.errors, status: :unprocessable_entity
     end
@@ -31,8 +39,9 @@ module V3
 
   # PATCH/PUT /users/1
   def update
+    @user = current_user
     if @user.update(user_params)
-      render json: @user.as_json(only: [:id, :name, :email, :token])
+      render json: @user.public_return
     else
       render json: @user.errors, status: :unprocessable_entity
     end
@@ -40,6 +49,7 @@ module V3
 
   # DELETE /users/1
   def destroy
+    @user = current_user
     @user.destroy
   end
 
